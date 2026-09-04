@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1320">
+  <meta name="description" content="Интерактивная сравнительная карта проекта «Товародвижение», Башни управления V2 и целевой модели V3.">
+  <title>Товародвижение → Башня V2 → Целевая V3</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#comparison">К сравнению</a>
+  <header class="hero">
+    <nav class="topbar" aria-label="Навигация страницы">
+      <a class="brand" href="#top" aria-label="В начало"><span>ТР</span> Карта развития</a>
+      <span class="topbar__tag">Supply Chain · сравнительная модель</span>
+    </nav>
+    <div class="hero__content" id="top">
+      <p class="eyebrow">От операционного факта к обучающейся системе</p>
+      <h1>Проект «Товародвижение» <i>→</i> Башня управления V2 <i>→</i> Целевая V3</h1>
+      <p class="lead">Девять этапов одного управленческого цикла. Выберите этап, чтобы увидеть, что уже создано, что добавила Башня и какой контур нужен следующей версии.</p>
+      <div class="hero__legend" aria-label="Легенда версий">
+        <span><i class="dot dot--base"></i>Товародвижение · операционный фундамент</span>
+        <span><i class="dot dot--v2"></i>Башня V2 · управляемое исполнение</span>
+        <span><i class="dot dot--v3"></i>V3 · целевая модель</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="journey" aria-labelledby="journey-title">
+      <div class="section-head">
+        <div><p class="eyebrow">Сквозной алгоритм</p><h2 id="journey-title">От данных до системного улучшения</h2></div>
+        <p>Кликните по этапу — сравнительная карта ниже перестроится без перезагрузки.</p>
+      </div>
+      <div class="stage-map" id="stageMap" role="list" aria-label="9 этапов управленческого цикла"></div>
+    </section>
+
+    <section class="comparison" id="comparison" aria-labelledby="comparison-title">
+      <div class="section-head section-head--controls">
+        <div><p class="eyebrow">Сравнительная карта</p><h2 id="comparison-title">Три уровня зрелости</h2></div>
+        <div class="view-switch" id="viewSwitch" role="group" aria-label="Режим сравнения">
+          <button data-view="base">Товародвижение</button>
+          <button data-view="v2">Башня V2</button>
+          <button data-view="v3">V3</button>
+          <button class="is-active" data-view="all" aria-pressed="true">Сравнить</button>
+        </div>
+      </div>
+
+      <div class="context-tabs" id="contextTabs" role="tablist" aria-label="Контуры управления">
+        <button role="tab" aria-selected="true" class="is-active" data-context="operational">Операционный контур</button>
+        <button role="tab" aria-selected="false" data-context="kaizen">Ежедневный Кайдзен</button>
+        <button role="tab" aria-selected="false" data-context="system">Системный контур</button>
+      </div>
+
+      <div class="focus-strip" aria-live="polite">
+        <div><span>Выбранный этап</span><strong id="focusTitle">Данные</strong></div>
+        <p id="focusSummary"></p>
+        <button id="showAllStages">Показать весь контур</button>
+      </div>
+
+      <div class="comparison-grid" id="comparisonGrid" aria-live="polite"></div>
+    </section>
+
+    <section class="principles" aria-labelledby="principles-title">
+      <div class="section-head"><div><p class="eyebrow">Что V3 обязана сохранить</p><h2 id="principles-title">Наследовать сильное. Замкнуть разрывы.</h2></div></div>
+      <div class="principle-grid">
+        <article><span>01</span><h3>Полный поток</h3><p>От матрицы и заказа до кассы, физической полки и подтверждённого результата.</p></article>
+        <article><span>02</span><h3>Единое состояние</h3><p>Один цифровой двойник товара, точки, партии, заказа и перемещения.</p></article>
+        <article><span>03</span><h3>Объективный факт</h3><p>Касса, склад, сканирование и фото отделены от аналитической гипотезы.</p></article>
+        <article><span>04</span><h3>Обучающий цикл</h3><p>Рекомендация → решение человека → результат → изменение правила или процесса.</p></article>
+      </div>
+    </section>
+  </main>
+
+  <footer><span>Точка Роста · сравнительная архитектурная карта</span><a href="#top">Наверх ↑</a></footer>
+  <script src="app.js"></script>
+</body>
+</html>
