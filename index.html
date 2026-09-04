@@ -4,52 +4,34 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#07111c">
-  <meta name="description" content="Интерактивная архитектурная карта развития товародвижения от операционного фундамента до целевой V3.">
-  <title>Архитектурная карта · Товародвижение → Башня V2 → V3</title>
+  <meta name="description" content="Сравнительная карта развития: проект «Товародвижение», Башня управления V2 и целевая V3.">
+  <title>Товародвижение → Башня V2 → Целевая V3</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <main class="app">
     <header class="topbar">
-      <div class="brand"><span>ТР</span><div><b>Архитектура товародвижения</b><small>единая карта развития · V3</small></div></div>
-      <div class="headline"><strong>Физический поток <i>×</i> управляющий цикл <i>×</i> три контура</strong><span>Выберите узел, чтобы сравнить ТД, Башню V2 и целевую модель</span></div>
-      <div class="tools" aria-label="Масштаб карты"><button id="zoomOut" title="Уменьшить">−</button><button id="fitView">Вписать</button><button id="zoomIn" title="Увеличить">+</button></div>
+      <div class="brand"><span>ТР</span><div><b>Карта развития</b><small>Supply Chain · V3</small></div></div>
+      <div class="title"><strong>Товародвижение <i>→</i> Башня V2 <i>→</i> Целевая V3</strong><span>Что было · что реализовано · что строим</span></div>
+      <div class="hint">Выберите этап и контур</div>
     </header>
 
-    <section class="workbench" id="workbench">
-      <div class="board-viewport" id="boardViewport">
-        <div class="board" id="board">
-          <div class="contour contour--system" data-contour="system"><span>03 · Системный контур</span></div>
-          <div class="contour contour--kaizen" data-contour="kaizen"><span>02 · Ежедневный Кайдзен</span></div>
-          <div class="contour contour--operational" data-contour="operational"><span>01 · Операционный контур</span></div>
+    <nav class="stage-nav" id="stageNav" aria-label="Этапы управленческого цикла"></nav>
 
-          <section class="flow-layer" aria-labelledby="flowTitle">
-            <div class="layer-label"><span>Физический поток</span><b id="flowTitle">От матрицы до кассы</b></div>
-            <div class="flow-row" id="flowRow"></div>
-          </section>
+    <nav class="contour-nav" id="contourNav" aria-label="Контуры управления">
+      <button class="is-active" data-contour="operational"><i></i><span><b>Операционный контур</b><small>Сигнал → решение → факт</small></span></button>
+      <button data-contour="kaizen"><i></i><span><b>Ежедневный Кайдзен</b><small>Повторы → Парето → эффект</small></span></button>
+      <button data-contour="system"><i></i><span><b>Системный контур</b><small>Правила → процесс → стандарт</small></span></button>
+    </nav>
 
-          <section class="cycle-layer" aria-labelledby="cycleTitle">
-            <div class="layer-label"><span>Управляющий цикл</span><b id="cycleTitle">Сигнал → решение → подтверждённый эффект</b></div>
-            <div class="cycle-row" id="cycleRow"></div>
-            <svg class="return-link" viewBox="0 0 1000 80" preserveAspectRatio="none" aria-hidden="true"><path d="M 945 8 C 940 70, 175 78, 94 20"/><path class="arrow" d="M94 20l13-5-5 13"/></svg>
-          </section>
-
-          <aside class="map-note"><b>V3 замыкает цикл</b><span>Кайдзен возвращает подтверждённое знание в план, правила и стандарты.</span></aside>
-        </div>
-      </div>
-
-      <aside class="detail-panel" id="detailPanel" aria-live="polite">
-        <div class="detail-head"><div><span id="detailMeta">Узел 01 · Операционный контур</span><h2 id="detailTitle">Данные</h2></div><button id="closePanel" aria-label="Закрыть панель">×</button></div>
-        <p class="detail-summary" id="detailSummary"></p>
-        <div class="mobile-tabs" id="mobileTabs" aria-label="Версия"><button class="is-active" data-version="td">ТД</button><button data-version="v2">V2</button><button data-version="v3">V3</button></div>
-        <div class="compare" id="compare"></div>
-        <div class="origin-legend"><b>Происхождение элементов V3</b><span><i class="badge badge--td">ТД</i> фундамент проекта</span><span><i class="badge badge--v2">V2</i> возможности Башни</span><span><i class="badge badge--both">ТД + V2</i> объединение</span><span><i class="badge badge--new">НОВОЕ V3</i> целевое развитие</span></div>
-      </aside>
+    <section class="comparison" aria-labelledby="selectionTitle">
+      <header class="selection-head"><div><span id="selectionMeta">Операционный контур · этап 01</span><h1 id="selectionTitle">Данные</h1></div><p id="selectionSummary"></p></header>
+      <div class="mobile-versions" id="mobileVersions" aria-label="Версия"><button class="is-active" data-version="td">ТД</button><button data-version="v2">V2</button><button data-version="v3">V3</button></div>
+      <div class="columns" id="columns"></div>
     </section>
 
-    <footer class="legendbar">
-      <div class="contour-nav" id="contourNav"><button data-contour="operational"><i></i><b>Операционный</b><span>сигнал → проверка</span></button><button data-contour="kaizen"><i></i><b>Ежедневный Кайдзен</b><span>повторы → эффект</span></button><button data-contour="system"><i></i><b>Системный</b><span>правила → процесс</span></button></div>
-      <div class="color-key"><span><i class="key key--flow"></i>товарный поток</span><span><i class="key key--risk"></i>дефект / риск</span><span><i class="key key--target"></i>целевая V3</span></div>
+    <footer class="legend">
+      <b>Происхождение решений V3</b><span><i class="badge badge--td">ТД</i> из проекта</span><span><i class="badge badge--v2">V2</i> из Башни</span><span><i class="badge badge--both">ТД + V2</i> объединение</span><span><i class="badge badge--new">НОВОЕ V3</i> целевое развитие</span>
     </footer>
   </main>
   <script src="app.js"></script>

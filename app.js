@@ -1,9 +1,5 @@
 'use strict';
 
-const physicalFlow=[
-  ['matrix','▦','Матрица'],['planogram','▤','Планограмма'],['forecast','⌁','Прогноз'],['order','🛒','Автозаказ'],['supplier','♜','Поставщик'],['dc','▣','РЦ'],['distribution','⇄','Распределение'],['store','⌂','Магазин'],['shelf','▥','Полка'],['checkout','▰','Касса']
-];
-
 const stages=[
  {id:'data',icon:'▤',title:'Данные',summary:'Единый язык фактов: от матрицы и партии до физической полки, кассы и происхождения каждого расчёта.',td:['Матрица SKU × магазин и правила ассортимента','Планограмма, кратность и параметры выкладки','БТ и экспресс-локалка как физический факт','Остаток магазина, полка, фото и касса'],v2:['Единые объекты SKU, партии, точки и заказа','Ledger движений и доступный остаток','FEFO, резервы и статусы запасов','Provenance расчётов и журнал событий'],v3:[['Общий цифровой двойник товара и сети','both'],['Физический факт полки отделён от гипотезы','td'],['Ledger остаётся источником движения запасов','v2'],['Сканирование сверяет учёт с реальностью','both'],['Версионирование мастер-данных и правил','new'],['Контроль качества и полноты входных данных','new']]},
  {id:'plan',icon:'⌁',title:'План',summary:'Спрос, ассортимент и ограничения превращаются в выполнимый план поставки, производства и полки.',td:['Матрица, планограмма и нормы выкладки','Формула автозаказа и кратность заказа','График поставок и окно приёмки','План продаж, запасов и доступности'],v2:['Прогнозная проекция PA(t)','Риск OOS и момент будущего дефицита','Сценарии до принятия решения','Связь спроса, поставок и перемещений'],v3:[['Матрица и планограмма задают ограничения','td'],['PA(t) становится единым ядром планирования','v2'],['Прогноз учитывает потерянные продажи','new'],['Единый план закупки, производства и логистики','both'],['Ограничения мощности проверяются до запуска','new'],['План имеет версию, владельца и горизонт','new']]},
@@ -21,36 +17,32 @@ const contexts={
  kaizen:{name:'Ежедневный Кайдзен',note:'повторяемые дефекты → Парето → ответственные → эффект'},
  system:{name:'Системный контур',note:'изменение формулы, ассортимента, графика и бизнес-процесса'}
 };
+const contextFocus={
+ operational:{td:'Конкретный дефект → БТ / экспресс-локалка → решение ГК → задача → контроль',v2:'Автоматическое исключение → приоритет → «Почему» → варианты А/Б/В → объективное закрытие',v3:'Автосигнал + БТ → причина → экономика → единая задача → закрытие после факта'},
+ kaizen:{td:'План-факт → АУТ / ОВЕР / ТБД → Парето → ответственные → проверка вчерашних решений',v2:'Повторные исключения → журнал решений → аналитика → незакрытые задачи',v3:'Автоповестка → Парето по потерям и повторам → незакрытые причины → измеренный эффект'},
+ system:{td:'КСУ / комитет → автозаказ → планограмма → матрица → график → поставщик → процесс',v2:'Лаборатория сценариев → повторные исключения → журнал решений → моделирование последствий',v3:'Повторяемая причина → change-проект → модель до внедрения → версия правила → измерение эффекта'}
+};
 const originNames={td:'ТД',v2:'V2',both:'ТД + V2',new:'НОВОЕ V3'};
-let state={stage:null,context:'operational',version:'td',zoom:1};
+let state={stage:'data',context:'operational',version:'td'};
 const byId=id=>document.getElementById(id);
 
-function renderMap(){
-  byId('flowRow').innerHTML=physicalFlow.map(([id,icon,label])=>`<button class="flow-node" data-flow="${id}" title="${label}"><span class="node-icon">${icon}</span><b>${label}</b></button>`).join('');
-  byId('cycleRow').innerHTML=stages.map((s,i)=>`<button class="cycle-node" data-id="${s.id}" aria-pressed="false"><span class="node-icon">${s.icon}</span><small>${String(i+1).padStart(2,'0')}</small><b>${s.title}</b></button>`).join('');
+function renderStages(){
+  byId('stageNav').innerHTML=stages.map(s=>`<button class="stage-button ${s.id===state.stage?'is-active':''}" data-id="${s.id}" aria-pressed="${s.id===state.stage}"><span class="icon">${s.icon}</span><b>${s.title}</b></button>`).join('');
 }
-function versionBlock(type,title,items){
+function column(type,title,kicker,items){
   const list=type==='v3'?items.map(([text,origin])=>`<li><span>${text}</span><i class="badge badge--${origin}">${originNames[origin]}</i></li>`).join(''):items.map(text=>`<li>${text}</li>`).join('');
-  return `<section class="version-block version-block--${type} ${state.version===type?'is-mobile-active':''}" data-version-block="${type}"><header><b>${title}</b><span>${type==='td'?'фундамент':type==='v2'?'реализовано':'целевая модель'}</span></header><ul>${list}</ul></section>`;
+  return `<article class="column column--${type} ${state.version===type?'is-mobile-active':''}" data-column="${type}"><header><span>${kicker}</span><h2>${title}</h2></header><p class="context-focus"><b>${contexts[state.context].name}:</b> ${contextFocus[state.context][type]}</p><ul>${list}</ul></article>`;
 }
-function openStage(id){
-  const s=stages.find(x=>x.id===id); if(!s)return;
-  state.stage=id; byId('workbench').classList.add('has-detail');
-  document.querySelectorAll('.cycle-node').forEach(x=>{const on=x.dataset.id===id;x.classList.toggle('is-active',on);x.setAttribute('aria-pressed',String(on))});
-  byId('detailMeta').textContent=`Узел ${String(stages.indexOf(s)+1).padStart(2,'0')} · ${contexts[state.context].name}`;
-  byId('detailTitle').textContent=s.title; byId('detailSummary').textContent=s.summary;
-  byId('compare').innerHTML=versionBlock('td','Проект «Товародвижение»',s.td)+versionBlock('v2','Башня управления V2',s.v2)+versionBlock('v3','Как должно быть в V3',s.v3);
+function renderComparison(){
+  const s=stages.find(x=>x.id===state.stage),number=String(stages.indexOf(s)+1).padStart(2,'0');
+  byId('selectionMeta').textContent=`${contexts[state.context].name} · этап ${number}`;byId('selectionTitle').textContent=s.title;byId('selectionSummary').textContent=s.summary;
+  byId('columns').innerHTML=column('td','Проект «Товародвижение»','Что было',s.td)+column('v2','Башня управления V2','Что реализовано',s.v2)+column('v3','Целевая V3','Что строим',s.v3);
 }
-function selectContext(id){
-  state.context=id; document.querySelectorAll('[data-contour]').forEach(x=>x.classList.toggle('is-active',x.dataset.contour===id));
-  if(state.stage)openStage(state.stage);
+function render(){renderStages();renderComparison();document.querySelectorAll('[data-contour]').forEach(x=>x.classList.toggle('is-active',x.dataset.contour===state.context));document.querySelectorAll('[data-version]').forEach(x=>x.classList.toggle('is-active',x.dataset.version===state.version))}
+function selectVersion(id){
+  state.version=id;document.querySelectorAll('[data-version]').forEach(x=>x.classList.toggle('is-active',x.dataset.version===id));document.querySelectorAll('[data-column]').forEach(x=>x.classList.toggle('is-mobile-active',x.dataset.column===id));
 }
-function selectVersion(id){state.version=id;document.querySelectorAll('[data-version]').forEach(x=>x.classList.toggle('is-active',x.dataset.version===id));document.querySelectorAll('[data-version-block]').forEach(x=>x.classList.toggle('is-mobile-active',x.dataset.versionBlock===id))}
-function zoom(delta){state.zoom=Math.max(.75,Math.min(1.2,state.zoom+delta));byId('board').style.transform=`scale(${state.zoom})`}
-renderMap();
-byId('cycleRow').addEventListener('click',e=>{const n=e.target.closest('[data-id]');if(n)openStage(n.dataset.id)});
-byId('contourNav').addEventListener('click',e=>{const n=e.target.closest('[data-contour]');if(n)selectContext(n.dataset.contour)});
-byId('mobileTabs').addEventListener('click',e=>{const n=e.target.closest('[data-version]');if(n)selectVersion(n.dataset.version)});
-byId('closePanel').addEventListener('click',()=>{state.stage=null;byId('workbench').classList.remove('has-detail');document.querySelectorAll('.cycle-node').forEach(x=>x.classList.remove('is-active'))});
-byId('zoomIn').addEventListener('click',()=>zoom(.08));byId('zoomOut').addEventListener('click',()=>zoom(-.08));byId('fitView').addEventListener('click',()=>{state.zoom=1;byId('board').style.transform='scale(1)'});
-selectContext('operational');
+byId('stageNav').addEventListener('click',e=>{const n=e.target.closest('[data-id]');if(n){state.stage=n.dataset.id;render()}});
+byId('contourNav').addEventListener('click',e=>{const n=e.target.closest('[data-contour]');if(n){state.context=n.dataset.contour;render()}});
+byId('mobileVersions').addEventListener('click',e=>{const n=e.target.closest('[data-version]');if(n)selectVersion(n.dataset.version)});
+render();
