@@ -54,7 +54,8 @@ const content = {
   }
 };
 
-let state={stage:'data',context:'operational',view:'all',showAll:false};
+const mobileView=window.matchMedia('(max-width: 600px)').matches;
+let state={stage:'data',context:'operational',view:mobileView?'base':'all'};
 const stageMap=document.getElementById('stageMap');
 const grid=document.getElementById('comparisonGrid');
 const focusTitle=document.getElementById('focusTitle');
@@ -62,10 +63,10 @@ const focusSummary=document.getElementById('focusSummary');
 
 function renderStages(){stageMap.innerHTML=stages.map((s,i)=>`<button class="stage ${s.id===state.stage?'is-active':''}" data-stage="${s.id}" role="listitem" aria-pressed="${s.id===state.stage}"><span class="stage__num">${String(i+1).padStart(2,'0')}</span><strong>${s.label}</strong></button>`).join('')}
 function detail(stage,version){const items=content[state.context][stage.id][version.id];return `<section class="stage-detail"><div class="stage-detail__tag"><b>${String(stages.indexOf(stage)+1).padStart(2,'0')} · ${stage.label}</b><span>${state.context==='operational'?'операции':state.context==='kaizen'?'ритм дня':'изменение системы'}</span></div><ul>${items.map(x=>`<li>${x}</li>`).join('')}</ul><p class="stage-detail__outcome">${stage.summary}</p></section>`}
-function renderGrid(){const selected=state.showAll?stages:[stages.find(s=>s.id===state.stage)];grid.dataset.view=state.view;grid.innerHTML=versions.map(v=>`<article class="version-card version-card--${v.id}" ${state.view!=='all'&&state.view!==v.id?'hidden':''}><header class="version-card__head"><span>${v.kicker}</span><h3>${v.title}</h3></header>${selected.map(s=>detail(s,v)).join('')}</article>`).join('')}
-function render(){const stage=stages.find(s=>s.id===state.stage);focusTitle.textContent=state.showAll?'Все 9 этапов':stage.label;focusSummary.textContent=state.showAll?'Полный цикл показан последовательно для каждого уровня зрелости.':stage.summary;document.getElementById('showAllStages').textContent=state.showAll?'Вернуться к этапу':'Показать весь контур';renderStages();renderGrid()}
-stageMap.addEventListener('click',e=>{const b=e.target.closest('[data-stage]');if(!b)return;state.stage=b.dataset.stage;state.showAll=false;render();document.getElementById('comparison').scrollIntoView({behavior:'smooth',block:'start'})});
+function renderGrid(){const selected=[stages.find(s=>s.id===state.stage)];grid.dataset.view=state.view;grid.innerHTML=versions.map(v=>`<article class="version-card version-card--${v.id}" ${state.view!=='all'&&state.view!==v.id?'hidden':''}><header class="version-card__head"><span>${v.kicker}</span><h3>${v.title}</h3></header>${selected.map(s=>detail(s,v)).join('')}</article>`).join('')}
+function render(){const stage=stages.find(s=>s.id===state.stage);focusTitle.textContent=stage.label;focusSummary.textContent=stage.summary;renderStages();renderGrid()}
+stageMap.addEventListener('click',e=>{const b=e.target.closest('[data-stage]');if(!b)return;state.stage=b.dataset.stage;render()});
 document.getElementById('viewSwitch').addEventListener('click',e=>{const b=e.target.closest('[data-view]');if(!b)return;state.view=b.dataset.view;document.querySelectorAll('[data-view]').forEach(x=>{const on=x===b;x.classList.toggle('is-active',on);x.setAttribute('aria-pressed',String(on))});renderGrid()});
 document.getElementById('contextTabs').addEventListener('click',e=>{const b=e.target.closest('[data-context]');if(!b)return;state.context=b.dataset.context;document.querySelectorAll('[data-context]').forEach(x=>{const on=x===b;x.classList.toggle('is-active',on);x.setAttribute('aria-selected',String(on))});render()});
-document.getElementById('showAllStages').addEventListener('click',()=>{state.showAll=!state.showAll;render()});
+if(mobileView){document.querySelectorAll('[data-view]').forEach(x=>{const on=x.dataset.view===state.view;x.classList.toggle('is-active',on);x.setAttribute('aria-pressed',String(on))})}
 render();
